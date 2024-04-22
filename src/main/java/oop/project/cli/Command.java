@@ -45,6 +45,16 @@ public class Command {
             else if (argumentsStructure.get(i).argType == ArgumentType.DECIMAL) {
                 // implement if we want to have decimals
             }
+            else if(argumentsStructure.get(i).argType == ArgumentType.UNSIGNEDINT) {
+                try {
+                    if(Integer.valueOf(words[i]) < 0) {
+                        throw new ArgumentParserException(words[i] + " is not a positive number.");
+                    }
+                }
+                catch(NumberFormatException e) {
+                    throw new ArgumentParserException(words[i] + " is not a number.");
+                }
+            }
         }
 
         // Put arguments in map
