@@ -38,8 +38,19 @@ public class Scenarios {
      */
     private static Map<String, Object> add(String arguments) {
         //TODO: Parse arguments and extract values.
-        int left = 0; //or BigInteger, etc.
-        int right = 0;
+
+        // Build the structure of a command by providing the ArgumentType of a command.
+        var command = new Command(List.of(
+                new Argument("left", ArgumentType.INTEGER),
+                new Argument("right", ArgumentType.INTEGER)
+        ));
+
+        // parsedArguments behaves like a map. Notice that the values of the arguments are strings
+        var parsedArguments  = command.parse(arguments);
+
+        int left = Integer.parseInt(parsedArguments.get("left"));
+        int right = Integer.parseInt(parsedArguments.get("right"));
+
         return Map.of("left", left, "right", right);
     }
 
