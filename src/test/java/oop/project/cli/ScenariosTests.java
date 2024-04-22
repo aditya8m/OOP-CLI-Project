@@ -18,7 +18,7 @@ public class ScenariosTests {
 
         @ParameterizedTest
         @MethodSource
-        public void testAdd(String name, String command, Object expected) {
+        public void testAdd(String name, String command, Object expected) throws ArgumentParserException {
             test(command, expected);
         }
 
@@ -39,7 +39,7 @@ public class ScenariosTests {
 
         @ParameterizedTest
         @MethodSource
-        public void testSub(String name, String command, Object expected) {
+        public void testSub(String name, String command, Object expected) throws ArgumentParserException {
             test(command, expected);
         }
 
@@ -62,7 +62,7 @@ public class ScenariosTests {
 
         @ParameterizedTest
         @MethodSource
-        public void testSqrt(String name, String command, Object expected) {
+        public void testSqrt(String name, String command, Object expected) throws ArgumentParserException {
             test(command, expected);
         }
 
@@ -82,7 +82,7 @@ public class ScenariosTests {
 
         @ParameterizedTest
         @MethodSource
-        public void testCalc(String name, String command, Object expected) {
+        public void testCalc(String name, String command, Object expected) throws ArgumentParserException {
             test(command, expected);
         }
 
@@ -103,7 +103,7 @@ public class ScenariosTests {
 
         @ParameterizedTest
         @MethodSource
-        public void testDate(String name, String command, Object expected) {
+        public void testDate(String name, String command, Object expected) throws ArgumentParserException {
             test(command, expected);
         }
 
@@ -116,7 +116,7 @@ public class ScenariosTests {
 
     }
 
-    private static void test(String command, Object expected) {
+    private static void test(String command, Object expected) throws ArgumentParserException {
         if (expected != null) {
             var result = Scenarios.parse(command);
             Assertions.assertEquals(expected, result);

@@ -1,6 +1,7 @@
 package oop.project.cli;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -13,7 +14,7 @@ public class Scenarios {
      * structure and requirements you may need to make changes to adapt it to
      * your needs - use whatever is convenient for your design.
      */
-    public static Map<String, Object> parse(String command) {
+    public static Map<String, Object> parse(String command) throws ArgumentParserException {
         //This assumes commands follow a similar structure to unix commands,
         //e.g. `command [arguments...]`. If your project uses a different
         //structure, e.g. Lisp syntax like `(command [arguments...])`, you may
@@ -36,7 +37,7 @@ public class Scenarios {
      *  - {@code left: <your integer type>}
      *  - {@code right: <your integer type>}
      */
-    private static Map<String, Object> add(String arguments) {
+    private static Map<String, Object> add(String arguments) throws ArgumentParserException{
         //TODO: Parse arguments and extract values.
 
         // Build the structure of a command by providing the ArgumentType of a command.
@@ -46,12 +47,12 @@ public class Scenarios {
         ));
 
         // parsedArguments behaves like a map. Notice that the values of the arguments are strings
-        var parsedArguments  = command.parse(arguments);
 
-        int left = Integer.parseInt(parsedArguments.get("left"));
-        int right = Integer.parseInt(parsedArguments.get("right"));
+            var parsedArguments  = command.parse(arguments);
+            int left = Integer.parseInt(parsedArguments.get("left"));
+            int right = Integer.parseInt(parsedArguments.get("right"));
 
-        return Map.of("left", left, "right", right);
+            return Map.of("left", left, "right", right);
     }
 
     /**
