@@ -1,6 +1,8 @@
 package oop.project.cli;
 
 import java.time.LocalDate;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -13,7 +15,7 @@ public class Scenarios {
      * structure and requirements you may need to make changes to adapt it to
      * your needs - use whatever is convenient for your design.
      */
-    public static Map<String, Object> parse(String command) {
+    public static Map<String, Object> parse(String command) throws ArgumentParserException {
         //This assumes commands follow a similar structure to unix commands,
         //e.g. `command [arguments...]`. If your project uses a different
         //structure, e.g. Lisp syntax like `(command [arguments...])`, you may
@@ -36,11 +38,23 @@ public class Scenarios {
      *  - {@code left: <your integer type>}
      *  - {@code right: <your integer type>}
      */
-    private static Map<String, Object> add(String arguments) {
+    private static Map<String, Object> add(String arguments) throws ArgumentParserException
+    {
         //TODO: Parse arguments and extract values.
-        int left = 0; //or BigInteger, etc.
-        int right = 0;
-        return Map.of("left", left, "right", right);
+
+        // Build the structure of a command by providing the ArgumentType of a command.
+        var command = new Command(List.of(
+                new Argument("left", ArgumentType.INTEGER, false, false),
+                new Argument("right", ArgumentType.INTEGER, false,false)
+        ));
+
+        // parsedArguments behaves like a map. Notice that the values of the arguments are strings
+
+            var parsedArguments  = command.parse(arguments);
+            int left = Integer.parseInt(parsedArguments.get("left"));
+            int right = Integer.parseInt(parsedArguments.get("right"));
+
+            return Map.of("left", left, "right", right);
     }
 
     /**
@@ -50,21 +64,53 @@ public class Scenarios {
      *       this as a non-optional decimal value using a default of 0.0.
      *  - {@code right: <your decimal type>} (required)
      */
-    static Map<String, Object> sub(String arguments) {
+    static Map<String, Object> sub(String arguments) throws ArgumentParserException{
         //TODO: Parse arguments and extract values.
+
+        var command = new Command(List.of(
+                new Argument("--left=", ArgumentType.DECIMAL, true, true),
+                new Argument("--right=", ArgumentType.DECIMAL, false, true)
+        ));
+
+        // parsedArguments behaves like a map. Notice that the values of the arguments are strings
+        var parsedArguments  = command.parse(arguments);
+
+        //Optional<Double> left = Optional.empty();
+       // double right = 0.0;
+
         Optional<Double> left = Optional.empty();
-        double right = 0.0;
-        return Map.of("left", left, "right", right);
+        double right = Double.parseDouble(parsedArguments.get("--right="));
+
+        String leftValue = parsedArguments.get("--left=");
+
+        if (!leftValue.equals("null")) {
+            double parsedLeft = Double.parseDouble(leftValue);
+            left = Optional.of(parsedLeft);
+        }
+
+
+        if (left.isEmpty())
+        {
+            return Map.of("left",Optional.empty() , "right", right);
+
+        }
+        else
+        {
+            return Map.of("left", left.get(), "right", right);
+
+        }
     }
 
     /**
      * Takes one positional argument:
      *  - {@code number: <your integer type>} where {@code number >= 0}
      */
-    static Map<String, Object> sqrt(String arguments) {
+    static Map<String, Object> sqrt(String arguments) throws ArgumentParserException{
         //TODO: Parse arguments and extract values.
-        int number = 0;
-        return Map.of("number", number);
+        var command = new Command(List.of(new Argument("number", ArgumentType.UNSIGNEDINT)));
+        var passedArg = command.parse(arguments);
+        int number = Integer.parseInt(passedArg.get("number"));
+        return Map.of("number",number);
     }
 
     /**
@@ -86,9 +132,11 @@ public class Scenarios {
      *     - Note: Consider this a type that CANNOT be supported by your library
      *       out of the box and requires a custom type to be defined.
      */
-    static Map<String, Object> date(String arguments) {
+    static Map<String, Object> date(String arguments) throws ArgumentParserException {
         //TODO: Parse arguments and extract values.
-        LocalDate date = LocalDate.EPOCH;
+        var command = new Command(List.of(new Argument("date",ArgumentType.DATE)));
+        var dateArg = command.parse(arguments);
+        LocalDate date = LocalDate.parse(dateArg.get("date"));
         return Map.of("date", date);
     }
 

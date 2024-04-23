@@ -18,7 +18,7 @@ public class ScenariosTests {
 
         @ParameterizedTest
         @MethodSource
-        public void testAdd(String name, String command, Object expected) {
+        public void testAdd(String name, String command, Object expected) throws ArgumentParserException {
             test(command, expected);
         }
 
@@ -34,24 +34,25 @@ public class ScenariosTests {
 
     }
 
+
     @Nested
     class Div {
 
         @ParameterizedTest
         @MethodSource
-        public void testSub(String name, String command, Object expected) {
+        public void testSub(String name, String command, Object expected) throws ArgumentParserException {
             test(command, expected);
         }
 
         public static Stream<Arguments> testSub() {
             return Stream.of(
-                Arguments.of("Sub", "sub --left 1.0 --right 2.0", Map.of("left", 1.0, "right", 2.0)),
-                Arguments.of("Left Only", "sub --left 1.0", null),
-                Arguments.of("Right Only", "sub --right 2.0", Map.of("left", Optional.empty(), "right", 2.0)),
+                Arguments.of("Sub", "sub --left=1.0 --right=2.0", Map.of("left", 1.0, "right", 2.0)),
+                Arguments.of("Left Only", "sub --left=1.0", null),
+                Arguments.of("Right Only", "sub --right=2.0", Map.of("left", Optional.empty(), "right", 2.0)),
                 Arguments.of("Missing Value", "sub --right", null),
-                Arguments.of("Extraneous Argument", "sub --right 2.0 extraneous", null),
-                Arguments.of("Misspelled Flag", "sub --write 2.0", null),
-                Arguments.of("Not A Number", "sub --right two", null)
+                Arguments.of("Extraneous Argument", "sub --right=2.0 extraneous", null),
+                Arguments.of("Misspelled Flag", "sub --write=2.0", null),
+                Arguments.of("Not A Number", "sub --right=two", null)
             );
         }
 
@@ -62,7 +63,7 @@ public class ScenariosTests {
 
         @ParameterizedTest
         @MethodSource
-        public void testSqrt(String name, String command, Object expected) {
+        public void testSqrt(String name, String command, Object expected) throws ArgumentParserException {
             test(command, expected);
         }
 
@@ -82,7 +83,7 @@ public class ScenariosTests {
 
         @ParameterizedTest
         @MethodSource
-        public void testCalc(String name, String command, Object expected) {
+        public void testCalc(String name, String command, Object expected) throws ArgumentParserException {
             test(command, expected);
         }
 
@@ -103,7 +104,7 @@ public class ScenariosTests {
 
         @ParameterizedTest
         @MethodSource
-        public void testDate(String name, String command, Object expected) {
+        public void testDate(String name, String command, Object expected) throws ArgumentParserException {
             test(command, expected);
         }
 
@@ -116,7 +117,7 @@ public class ScenariosTests {
 
     }
 
-    private static void test(String command, Object expected) {
+    private static void test(String command, Object expected) throws ArgumentParserException {
         if (expected != null) {
             var result = Scenarios.parse(command);
             Assertions.assertEquals(expected, result);
