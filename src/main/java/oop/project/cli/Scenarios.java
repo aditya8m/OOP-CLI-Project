@@ -38,13 +38,14 @@ public class Scenarios {
      *  - {@code left: <your integer type>}
      *  - {@code right: <your integer type>}
      */
-    private static Map<String, Object> add(String arguments) throws ArgumentParserException{
+    private static Map<String, Object> add(String arguments) throws ArgumentParserException
+    {
         //TODO: Parse arguments and extract values.
 
         // Build the structure of a command by providing the ArgumentType of a command.
         var command = new Command(List.of(
-                new Argument("left", ArgumentType.INTEGER),
-                new Argument("right", ArgumentType.INTEGER)
+                new Argument("left", ArgumentType.INTEGER, false, false),
+                new Argument("right", ArgumentType.INTEGER, false,false)
         ));
 
         // parsedArguments behaves like a map. Notice that the values of the arguments are strings
@@ -63,11 +64,41 @@ public class Scenarios {
      *       this as a non-optional decimal value using a default of 0.0.
      *  - {@code right: <your decimal type>} (required)
      */
-    static Map<String, Object> sub(String arguments) {
+    static Map<String, Object> sub(String arguments) throws ArgumentParserException{
         //TODO: Parse arguments and extract values.
+
+        var command = new Command(List.of(
+                new Argument("--left=", ArgumentType.DECIMAL, true, true),
+                new Argument("--right=", ArgumentType.DECIMAL, false, true)
+        ));
+
+        // parsedArguments behaves like a map. Notice that the values of the arguments are strings
+        var parsedArguments  = command.parse(arguments);
+
+        //Optional<Double> left = Optional.empty();
+       // double right = 0.0;
+
         Optional<Double> left = Optional.empty();
-        double right = 0.0;
-        return Map.of("left", left, "right", right);
+        double right = Double.parseDouble(parsedArguments.get("--right="));
+
+        String leftValue = parsedArguments.get("--left=");
+
+        if (!leftValue.equals("null")) {
+            double parsedLeft = Double.parseDouble(leftValue);
+            left = Optional.of(parsedLeft);
+        }
+
+
+        if (left.isEmpty())
+        {
+            return Map.of("left",Optional.empty() , "right", right);
+
+        }
+        else
+        {
+            return Map.of("left", left.get(), "right", right);
+
+        }
     }
 
     /**

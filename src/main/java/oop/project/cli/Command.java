@@ -2,6 +2,7 @@ package oop.project.cli;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,12 +10,21 @@ import java.util.Map;
 public class Command {
 
     List<Argument> argumentsStructure;
-    int numberOfArguments;
+    int numberOfOptionalArguments;
+    int numberOfRequiredArguments;
+    int totalNumberOfArguments;
+    int numberOfNamedArguments;
+    int numberOfNamedPositionalArguments;
 
     public Command(List<Argument> arguments)
     {
         this.argumentsStructure = arguments;
-        this.numberOfArguments = arguments.size();
+        this.totalNumberOfArguments = arguments.size();
+
+        for(Argument arg : arguments) {if (arg.optional) numberOfOptionalArguments++;}
+        for(Argument arg : arguments) {if (!arg.optional) numberOfRequiredArguments++;}
+        for(Argument arg : arguments) {if (arg.named) numberOfNamedArguments++;}
+        for(Argument arg : arguments) {if (!arg.named) numberOfNamedPositionalArguments++;}
     }
 
     Map<String, String> parse(String arguments) throws ArgumentParserException
@@ -22,30 +32,100 @@ public class Command {
         Map<String, String> parsedArguments = new HashMap<String, String>();
 
         String[] words = arguments.split(" ");
+        String[] wordsWithoutName = new String[totalNumberOfArguments];
 
-        // Check for number of arguments
-        if (words.length != numberOfArguments)
+
+        for (int i = 0; i < totalNumberOfArguments; i++) { wordsWithoutName[i] = "null";}
+
+        for (int i = 0; i < words.length; i++)
         {
-            throw new ArgumentParserException(numberOfArguments + " arguments are required.");
+            if (argumentsStructure.get(i).named)
+            {
+                String[] parts = words[i].split("=");
+                wordsWithoutName[i] = parts[1];
+                continue;
+            }
+            wordsWithoutName[i] = words[i];
         }
 
-        // Parse each argument based on the structure
-        for (int i = 0; i < numberOfArguments; i++)
+
+        // Check for number of arguments
+        if (words.length > totalNumberOfArguments)
         {
+            throw new ArgumentParserException("Too many arguments provided");
+        }
+        else if (words.length < numberOfRequiredArguments)
+        {
+            throw new ArgumentParserException("Not enough arguments provided");
+        }
+
+        // Check for required args
+
+        for (int i = 0 ; i < numberOfRequiredArguments; i++)
+        {
+            for (var arg : argumentsStructure)
+            {
+                if (arg.named)
+                {
+                    if (!arg.optional)
+                    {
+                        // Search for it in the words
+                        boolean contains = false;
+
+                        for (String word : words)
+                        {
+                            if (word.contains(arg.name))
+                            {
+                                contains = true;
+                            }
+                        }
+
+                        if (!contains) throw new ArgumentParserException("Required arguments needed.");
+                    }
+                }
+
+
+            }
+        }
+
+
+        // Parse each argument based on the structure
+        for (int i = 0; i < words.length; i++)
+        {
+
+
             if (argumentsStructure.get(i).argType == ArgumentType.INTEGER)
             {
+
                 try
                 {
                     Integer.valueOf(words[i]);
                 }
                 catch (NumberFormatException e)
                 {
-                    throw new ArgumentParserException(words[i] + " is not a number.");
+                    throw new ArgumentParserException(words[i] + " is not an integer.");
                 }
 
             }
             else if (argumentsStructure.get(i).argType == ArgumentType.DECIMAL) {
-                // implement if we want to have decimals
+                try
+                {
+                    Double.valueOf(wordsWithoutName[i]);
+                }
+                catch (NumberFormatException e)
+                {
+                    throw new ArgumentParserException(words[i] + " is not a double.");
+                }
+            }
+            else if(argumentsStructure.get(i).argType == ArgumentType.UNSIGNEDINT) {
+                try {
+                    if(Integer.valueOf(words[i]) < 0) {
+                        throw new ArgumentParserException(words[i] + " is not a positive number.");
+                    }
+                }
+                catch(NumberFormatException e) {
+                    throw new ArgumentParserException(words[i] + " is not a number.");
+                }
             }
             else if(argumentsStructure.get(i).argType == ArgumentType.UNSIGNEDINT) {
                 try {
@@ -65,13 +145,46 @@ public class Command {
             }
         }
 
-        // Put arguments in map
-        for (int i = 0; i < numberOfArguments; i++)
+
+
+//        for (int i = 0; i < words.length; i++)
+//        {
+//            if (argumentsStructure.get(i).named)
+//            {
+//                String[] parts = words[i].split("=");
+//                wordsWithoutName[i] = parts[1];
+//                continue;
+//            }
+//            wordsWithoutName[i] = words[i];
+//        }
+
+
+
+
+        for (int i = 0; i < totalNumberOfArguments; i++)
         {
-            parsedArguments.put(argumentsStructure.get(i).name, words[i]);
+            String key = argumentsStructure.get(i).name;
+            String value = "null";
+
+            if (!argumentsStructure.get(i).named)
+            {
+                value = words[i];
+            }
+            else
+            {
+                for (String word : words)
+                {
+                    if (word.contains(key))
+                    {
+                        value = word.substring(word.indexOf('=') + 1);
+                    }
+                }
+            }
+
+            parsedArguments.put(key, value);
+
+
         }
-
-
 
         return parsedArguments;
     }
