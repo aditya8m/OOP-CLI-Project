@@ -1,5 +1,7 @@
 package oop.project.cli;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -123,6 +125,22 @@ public class Command {
                 }
                 catch(NumberFormatException e) {
                     throw new ArgumentParserException(words[i] + " is not a number.");
+                }
+            }
+            else if(argumentsStructure.get(i).argType == ArgumentType.UNSIGNEDINT) {
+                try {
+                    if(Integer.valueOf(words[i]) < 0) {
+                        throw new ArgumentParserException(words[i] + " is not a positive number.");
+                    }
+                }
+                catch(NumberFormatException e) {
+                    throw new ArgumentParserException(words[i] + " is not a number.");
+                }
+            }
+            else if(argumentsStructure.get(i).argType == ArgumentType.DATE){
+                String dateStr = words[i];
+                if (!dateStr.matches("\\d{4}-\\d{2}-\\d{2}")) {
+                    throw new ArgumentParserException(dateStr + " is an invalid date not in yyyy-MM-dd format.");
                 }
             }
         }

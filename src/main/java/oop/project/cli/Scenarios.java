@@ -1,6 +1,7 @@
 package oop.project.cli;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -131,9 +132,11 @@ public class Scenarios {
      *     - Note: Consider this a type that CANNOT be supported by your library
      *       out of the box and requires a custom type to be defined.
      */
-    static Map<String, Object> date(String arguments) {
+    static Map<String, Object> date(String arguments) throws ArgumentParserException {
         //TODO: Parse arguments and extract values.
-        LocalDate date = LocalDate.EPOCH;
+        var command = new Command(List.of(new Argument("date",ArgumentType.DATE)));
+        var dateArg = command.parse(arguments);
+        LocalDate date = LocalDate.parse(dateArg.get("date"));
         return Map.of("date", date);
     }
 

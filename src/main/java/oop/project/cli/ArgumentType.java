@@ -4,6 +4,6 @@ public enum ArgumentType {
     INTEGER,
     DECIMAL,
     STRING,
-
-    UNSIGNEDINT
+    UNSIGNEDINT,
+    DATE
 }
