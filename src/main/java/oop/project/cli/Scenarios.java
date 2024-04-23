@@ -104,10 +104,12 @@ public class Scenarios {
      * Takes one positional argument:
      *  - {@code number: <your integer type>} where {@code number >= 0}
      */
-    static Map<String, Object> sqrt(String arguments) {
+    static Map<String, Object> sqrt(String arguments) throws ArgumentParserException{
         //TODO: Parse arguments and extract values.
-        int number = 0;
-        return Map.of("number", number);
+        var command = new Command(List.of(new Argument("number", ArgumentType.UNSIGNEDINT)));
+        var passedArg = command.parse(arguments);
+        int number = Integer.parseInt(passedArg.get("number"));
+        return Map.of("number",number);
     }
 
     /**

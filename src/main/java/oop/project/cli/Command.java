@@ -115,6 +115,16 @@ public class Command {
                     throw new ArgumentParserException(words[i] + " is not a double.");
                 }
             }
+            else if(argumentsStructure.get(i).argType == ArgumentType.UNSIGNEDINT) {
+                try {
+                    if(Integer.valueOf(words[i]) < 0) {
+                        throw new ArgumentParserException(words[i] + " is not a positive number.");
+                    }
+                }
+                catch(NumberFormatException e) {
+                    throw new ArgumentParserException(words[i] + " is not a number.");
+                }
+            }
         }
 
 
